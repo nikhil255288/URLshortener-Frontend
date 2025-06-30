@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
+  },
+  "project-root": {
+    "client": {
+      "index.html": "HTML entry point for Vite app",
+      "vite.config.ts": "Vite configuration",
+      "tsconfig.json": "TS config for frontend",
+      "postcss.config.js": "PostCSS config",
+      "tailwind.config.ts": "TailwindCSS config",
+      "src": {
+        "main.tsx": "App entry point",
+        "App.tsx": "Root React component",
+        "components": {
+          "Hero.tsx": "Hero UI section",
+          "Features.tsx": "Features UI section",
+          "UrlHistory.tsx": "History component",
+          "ui": "UI components from shadcn/ui"
+        },
+        "hooks": {
+          "use-toast.ts": "Toast hook"
+        },
+        "pages": {
+          "index.tsx": "Landing page with form + logic"
+        },
+        "styles": {
+          "global.css": "TailwindCSS global styles"
+        }
+      }
+    },
+    "server": {
+      "index.js": "Express server entry point",
+      "db.js": "MongoDB connection setup",
+      "models": {
+        "url.js": "Mongoose URL schema"
+      },
+      "routes": {
+        "shorten.js": "Route to shorten URL",
+        "redirect.js": "Route to handle redirection",
+        "history.js": "Route to fetch history"
+      },
+      ".env": "Environment variables",
+      "package.json": "Backend dependencies"
+    },
+    "README.md": "Project overview",
+    ".gitignore": "Ignored files",
+    "tailwind.app.json": "Custom Tailwind tokens",
+    "tsconfig.json": "Root TS config (can extend to client/server)"
+  }
+}
