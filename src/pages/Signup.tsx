@@ -37,7 +37,8 @@ const Signup = () => {
         title: "Signup Successful",
         description: "Welcome aboard!",
       });
-      navigate("/dashboard");
+
+      navigate("/home"); // ✅ Redirect to /home instead of /dashboard
     } catch (err) {
       toast({
         title: "Signup Error",
