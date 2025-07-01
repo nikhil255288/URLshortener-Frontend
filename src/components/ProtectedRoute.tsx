@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.tsx
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
@@ -13,15 +14,18 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!token) return;
-    const payload = parseJwt(token);
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (!payload?.exp || payload.exp < currentTime) {
-      clearToken();
+    if (token) {
+      const payload = parseJwt(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (!payload?.exp || payload.exp < currentTime) {
+        clearToken();
+      }
     }
   }, [token, clearToken]);
 
-  if (!token) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!token) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
 
   return <>{children}</>;
 };

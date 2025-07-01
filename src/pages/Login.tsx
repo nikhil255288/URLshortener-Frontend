@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/store/authStore"; // Zustand store
+import { useAuthStore } from "@/store/authStore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,37 +12,46 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { setToken } = useAuthStore(); // Zustand function
+  const { setToken } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    if (!email.trim() || !password.trim()) {
+      toast({
+        title: "Missing Fields",
+        description: "Email and password are required",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ✅ Send/receive cookies
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Invalid email or password");
       }
 
-      setToken(data.token); // ✅ Save access token in Zustand + localStorage
+      setToken(data.token);
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
-
-      navigate("/dashboard"); // ✅ Redirect to dashboard
+      navigate("/home"); // Redirect to Home instead of Dashboard
     } catch (err) {
       toast({
-        title: "Login Error",
-        description: err instanceof Error ? err.message : "Unknown error",
+        title: "Login Failed",
+        description: err instanceof Error ? err.message : "Something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -76,6 +85,15 @@ const Login = () => {
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
+          <p className="text-sm text-center mt-4 text-gray-500">
+            Don’t have an account?{" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className="text-blue-600 cursor-pointer hover:underline"
+            >
+              Sign up
+            </span>
+          </p>
         </CardContent>
       </Card>
     </div>
