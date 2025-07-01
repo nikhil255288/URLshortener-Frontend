@@ -1,6 +1,9 @@
 // src/lib/authFetch.ts
 import { useAuthStore } from "../store/authStore";
 
+// Load API base URL from Vite environment variable
+const API = import.meta.env.VITE_API_URL;
+
 export const authFetch = async (
   url: string,
   options: RequestInit = {},
@@ -21,7 +24,7 @@ export const authFetch = async (
   // Handle access token expiry
   if (response.status === 401 && retry) {
     try {
-      const refreshRes = await fetch("http://localhost:5000/auth/refresh", {
+      const refreshRes = await fetch(`${API}/auth/refresh`, {
         method: "POST",
         credentials: "include", // ⬅️ Send refresh token cookie
       });
