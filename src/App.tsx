@@ -1,4 +1,3 @@
-// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,9 +6,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 
 // Pages
+import Landing from "./pages/Landing"; // ✅ NEW PUBLIC HOMEPAGE
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Index from "./pages/Index"; // optional
+import Index from "./pages/Index"; // Authenticated user landing (shortener form)
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Analytics from "./pages/Analytics";
@@ -31,17 +31,12 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* 🔓 Public routes */}
-            <Route
-              path="/"
-              element={
-                token ? <Navigate to="/dashboard" replace /> : <Navigate to="/signup" replace />
-              }
-            />
-            <Route path="/signup" element={<Signup />} />
+            {/* 🔓 Public Routes */}
+            <Route path="/" element={token ? <Navigate to="/home" /> : <Landing />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-            {/* 🔒 Protected layout routes */}
+            {/* 🔒 Protected Routes */}
             <Route
               element={
                 <ProtectedRoute>
@@ -49,13 +44,13 @@ const App = () => {
                 </ProtectedRoute>
               }
             >
+              <Route path="/home" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/history" element={<History />} />
               <Route path="/analytics" element={<Analytics />} />
-              <Route path="/home" element={<Index />} /> {/* optional homepage */}
             </Route>
 
-            {/* 🚫 Fallback */}
+            {/* 🚫 Not Found */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
