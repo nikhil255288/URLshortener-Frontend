@@ -4,6 +4,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
+// ✅ Get API base from environment
+const API_BASE = import.meta.env.VITE_API_URL;
+
 interface AnalyticsItem {
   _id: string;
   originalUrl: string;
@@ -28,7 +31,7 @@ const Dashboard = () => {
       if (endDate) queryParams.append("endDate", endDate);
       if (limit) queryParams.append("limit", limit.toString());
 
-      const res = await authFetch(`http://localhost:5000/analytics?${queryParams.toString()}`);
+      const res = await authFetch(`${API_BASE}/analytics?${queryParams.toString()}`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Analytics fetch failed");
@@ -48,7 +51,7 @@ const Dashboard = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await authFetch(`http://localhost:5000/url/${id}`, {
+      const res = await authFetch(`${API_BASE}/url/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -56,7 +59,7 @@ const Dashboard = () => {
       if (!res.ok) throw new Error(data.error || "Failed to delete");
 
       toast({ title: "Deleted", description: "URL deleted successfully" });
-      fetchAnalytics();
+      fetchAnalytics(); // 🔁 Refresh list
     } catch (err) {
       toast({
         title: "Delete failed",
@@ -141,12 +144,12 @@ const Dashboard = () => {
               <p className="text-sm text-gray-600">
                 Short:{" "}
                 <a
-                  href={`http://localhost:5000/s/${item.shortCode}`}
+                  href={`${API_BASE}/s/${item.shortCode}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono underline text-blue-500"
                 >
-                  http://localhost:5000/s/{item.shortCode}
+                  {`${API_BASE}/s/${item.shortCode}`}
                 </a>
               </p>
               <p className="text-sm text-gray-800">
