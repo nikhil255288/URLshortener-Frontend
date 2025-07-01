@@ -14,6 +14,9 @@ interface AnalyticsData {
   }[];
 }
 
+// ✅ Get base API URL from environment
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const Analytics = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +26,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await authFetch("http://localhost:5000/analytics");
+        const res = await authFetch(`${API_BASE}/analytics`);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error || "Failed to fetch analytics");
         setData(result);
@@ -44,6 +47,7 @@ const Analytics = () => {
         setLoading(false);
       }
     };
+
     fetchAnalytics();
   }, [navigate, toast]);
 
@@ -71,7 +75,17 @@ const Analytics = () => {
           {data?.topLinks?.map((link) => (
             <div key={link._id} className="border rounded-md p-3">
               <p><span className="font-medium">Original:</span> {link.originalUrl}</p>
-              <p><span className="font-medium">Short:</span> http://localhost:5000/s/{link.shortCode}</p>
+              <p>
+                <span className="font-medium">Short:</span>{" "}
+                <a
+                  href={`${API_BASE}/s/${link.shortCode}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  {`${API_BASE}/s/${link.shortCode}`}
+                </a>
+              </p>
               <p><span className="font-medium">Clicks:</span> {link.clicks}</p>
             </div>
           ))}
