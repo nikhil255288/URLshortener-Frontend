@@ -1,8 +1,4 @@
-
-/**
- * API service layer - ready for Supabase integration
- * This file will handle all API calls when backend is connected
- */
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export interface UrlData {
   id?: string;
@@ -13,36 +9,51 @@ export interface UrlData {
   userId?: string;
 }
 
-// Mock API functions - replace with real Supabase calls later
 export const urlService = {
   async createShortUrl(originalUrl: string, userId?: string): Promise<UrlData> {
-    // TODO: Replace with Supabase API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: Math.random().toString(36),
-          originalUrl,
-          shortCode: Math.random().toString(36).substring(2, 8),
-          clicks: 0,
-          createdAt: new Date(),
-          userId,
-        });
-      }, 1000);
+    const response = await fetch(`${API_BASE_URL}/url/shorten`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`, // if using JWT
+      },
+      body: JSON.stringify({ originalUrl, userId }),
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to shorten URL");
+    }
+
+    return response.json();
   },
 
   async getUserUrls(userId: string): Promise<UrlData[]> {
-    // TODO: Replace with Supabase API call
-    return [];
+    const response = await fetch(`${API_BASE_URL}/url/history`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch URLs");
+    }
+
+    return response.json();
   },
 
   async getUrlByShortCode(shortCode: string): Promise<UrlData | null> {
-    // TODO: Replace with Supabase API call
-    return null;
+    const response = await fetch(`${API_BASE_URL}/url/${shortCode}`);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
   },
 
   async incrementClickCount(shortCode: string): Promise<void> {
-    // TODO: Replace with Supabase API call
-    console.log(`Incrementing clicks for ${shortCode}`);
+    await fetch(`${API_BASE_URL}/url/click/${shortCode}`, {
+      method: "POST",
+    });
   },
 };
