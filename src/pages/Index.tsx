@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, Copy, CheckCircle, LinkIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/store/authStore";
+import { parseJwt } from "@/utils/jwt";
 
 // Sections
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Analytics from "@/pages/Analytics";
-import { useAuthStore } from "@/store/authStore";
-import { parseJwt } from "@/utils/jwt";
 
 const Index = () => {
   const [longUrl, setLongUrl] = useState("");
@@ -22,17 +22,12 @@ const Index = () => {
   const token = useAuthStore((state) => state.token);
   const navigate = useNavigate();
 
-  // 🔐 Check token validity on load
+  // 🔐 Redirect to login if token is invalid
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    const payload = parseJwt(token);
+    const payload = token ? parseJwt(token) : null;
     const currentTime = Math.floor(Date.now() / 1000);
 
-    if (!payload?.exp || payload.exp < currentTime) {
+    if (!token || !payload?.exp || payload.exp < currentTime) {
       useAuthStore.getState().clearToken();
       navigate("/login");
     }
@@ -70,7 +65,7 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/shorten", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/shorten`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +104,7 @@ const Index = () => {
         description: "Short URL copied to clipboard",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to copy URL",
@@ -139,7 +134,7 @@ const Index = () => {
                       placeholder="https://example.com/very-long-url"
                       value={longUrl}
                       onChange={(e) => setLongUrl(e.target.value)}
-                      className="pl-10 h-12 text-base border-slate-200 focus:border-blue-500 transition-colors"
+                      className="pl-10 h-12 text-base border-slate-200 focus:border-blue-500"
                       disabled={isLoading}
                     />
                   </div>
