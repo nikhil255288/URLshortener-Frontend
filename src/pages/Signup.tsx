@@ -14,35 +14,59 @@ const Signup = () => {
   const navigate = useNavigate();
   const { setToken } = useAuthStore();
 
+  const validateInputs = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!validateInputs()) return;
 
+    setLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ✅ send refresh token cookie
+        credentials: "include", // Send refresh token cookie
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Signup failed");
+        throw new Error(data.error || "Signup failed. Try a different email.");
       }
 
-      setToken(data.token); // ✅ Store access token in Zustand
+      setToken(data.token);
       toast({
         title: "Signup Successful",
         description: "Welcome aboard!",
       });
 
-      navigate("/home"); // ✅ Redirect to /home instead of /dashboard
+      navigate("/home"); // Redirect to homepage
     } catch (err) {
       toast({
         title: "Signup Error",
-        description: err instanceof Error ? err.message : "Unknown error",
+        description: err instanceof Error ? err.message : "Something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -66,7 +90,7 @@ const Signup = () => {
             />
             <Input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 6 chars)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
